@@ -4,6 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Security.Cryptography;
+using System.Net;
+using System.Net.Sockets;
+using System.IO;
 
 namespace Bai1
 {
@@ -111,24 +114,56 @@ namespace Bai1
         #endregion
 
         /* MAIN */
+        private static TcpClient client;
+        private static IPAddress remoteAddr = IPAddress.Parse("127.0.0.1");
+        private static int remotePort = 8080;
+
         private static string plainText = null;
-        private static string password = null;
+        private static string password = "NT106L22";    // Example password
+        //password = RandomPassword(/*optional*/);      // password size default: 4
 
         static void Main(string[] args)
         {
+            Console.WriteLine("---------------------------------");
+            Console.WriteLine("------------CLIENT---------------");
+            Console.WriteLine("---------------------------------");
+
             plainText = Console.ReadLine();
-            password = RandomPassword(/*optional*/);    // password size default: 4
 
             string encryptedText = Encrypt(plainText, password);
             string decryptedText = Decrypt(encryptedText, password);
             string hashCode = CalcHash(plainText);
 
+            Console.WriteLine("---------------------------------");
             Console.WriteLine($"Encrypted text: {encryptedText}");
             Console.WriteLine($"Encrypted text size: {encryptedText.Length}");
             Console.WriteLine($"Decrypted text: {decryptedText}");
             Console.WriteLine($"Encrypted text size: {decryptedText.Length}");
             Console.WriteLine("Hash code: " + hashCode);
             Console.WriteLine($"Hash code size: {hashCode.Length}");
+
+            // socket connection establishment
+            try
+            {
+                client = new TcpClient();
+                client.Connect(remoteAddr, remotePort);
+                NetworkStream stream = client.GetStream();
+                StreamWriter writer = new StreamWriter(stream);
+                Console.WriteLine("---------------------------------");
+                Console.WriteLine($"Connected to {remoteAddr}:{remotePort}");
+                writer.AutoFlush = true;
+                if (encryptedText != null)
+                    writer.WriteLine(encryptedText);
+                if (hashCode != null)
+                    writer.WriteLine(hashCode);
+                Console.WriteLine("successful sending data");
+                stream.Close();
+                client.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             Console.ReadKey();
         }
