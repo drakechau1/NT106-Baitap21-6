@@ -120,7 +120,7 @@ namespace Bai1
             password = RandomPassword(/*optional*/);    // password size default: 4
 
             string encryptedText = Encrypt(plainText, password);
-            string decryptedText = Decrypt(plainText, password);
+            string decryptedText = Decrypt(encryptedText, password);
             string hashCode = CalcHash(plainText);
 
             Console.WriteLine($"Encrypted text: {encryptedText}");
@@ -128,7 +128,7 @@ namespace Bai1
             Console.WriteLine($"Decrypted text: {decryptedText}");
             Console.WriteLine($"Encrypted text size: {decryptedText.Length}");
             Console.WriteLine("Hash code: " + hashCode);
-            Console.WriteLine($"Hash code size: {hashCode}");
+            Console.WriteLine($"Hash code size: {hashCode.Length}");
 
             Console.ReadKey();
         }
